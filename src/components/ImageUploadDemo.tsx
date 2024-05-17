@@ -68,8 +68,17 @@ const ImageUploadDemo = () => {
         };
       };
 
-      console.log(data.body);
-      setFileDetails(data.body);
+      const body = data?.body;
+
+      if (body) {
+        const fP = String(body.fileName).replace("/uploads/", "");
+        const publicPath = `http://localhost:3000/api/get-file?filename=${fP}`;
+        const details: typeof fileDetails = {
+          message: body.message,
+          fileName: publicPath,
+        };
+        setFileDetails(details);
+      }
     }
   };
 

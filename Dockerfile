@@ -43,6 +43,8 @@ ENV NODE_ENV production
 # Uncomment the following line in case you want to disable telemetry during runtime.
 ENV NEXT_TELEMETRY_DISABLED 1
 
+RUN apk add acl
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
@@ -51,6 +53,19 @@ COPY --from=builder /app/public ./public
 # Set the correct permission for prerender cache
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
+
+RUN mkdir .next/uploads
+
+# Set default user + group for all new files inside the .next directory
+RUN chown -R nextjs:nodejs .next
+RUN chown -R nextjs:nodejs public/uploads
+
+# Set uploads folder to such permission that nextjs can write to it and serve them
+RUN setfacl -m u:nextjs:rwx public/uploads
+RUN setfacl -m d:u:nextjs:rwx public/uploads
+
+# Set default permission completely open on public/uploads
+RUN chmod -R 666 public/uploads
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
