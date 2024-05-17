@@ -13,11 +13,21 @@ const NavBar = () => {
           className="rounded-md border-2 border-neutral-900 px-3 py-1 transition-colors duration-300 hover:bg-neutral-900 hover:text-neutral-100"
           href="/"
           style={{
-            backgroundColor: pathname === "/" ? "#000" : undefined,
-            color: pathname === "/" ? "#fff" : undefined,
+            backgroundColor: pathname === "/" ? "#fff" : undefined,
+            color: pathname === "/" ? "#000" : undefined,
           }}
         >
           Home
+        </Link>
+        <Link
+          className="rounded-md border-2 border-neutral-900 px-3 py-1 transition-colors duration-300 hover:bg-neutral-900 hover:text-neutral-100"
+          href="/docs"
+          style={{
+            backgroundColor: pathname === "/docs" ? "#fff" : undefined,
+            color: pathname === "/docs" ? "#000" : undefined,
+          }}
+        >
+          Docs
         </Link>
       </div>
     </nav>

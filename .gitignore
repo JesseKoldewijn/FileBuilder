@@ -40,3 +40,10 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# uploaded files
+public/uploads
+
+# service worker
+public/sw.js
+public/swe-worker-*.js

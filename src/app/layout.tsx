@@ -2,20 +2,25 @@ import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
 
-import NavBar from "~/components/NavBar";
+import NavBar from "~/components/layout/NavBar";
 import { cookies } from "next/headers";
 import { appConfig } from "~/config/app";
+import PageMeta from "~/components/layout/PageMeta";
+import { type Viewport, type Metadata } from "next";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-export const metadata = {
-  title: "Temp File-Builder",
-  description:
-    "This application builds files based on a base64 string and responds with a public URL to allow file downloads for a curtain amount of time",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+const APP_NAME = "File-Builder";
+const APP_DEFAULT_TITLE = "File-Builder";
+const APP_TITLE_TEMPLATE = "%s | File-Builder";
+const APP_DESCRIPTION =
+  "This application builds files based on a base64 string and responds with a public URL to allow file downloads for a curtain amount of time";
+
+export const viewport: Viewport = {
+  themeColor: "#fff",
 };
 
 export default function RootLayout({
@@ -29,6 +34,9 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={theme}>
+      <head>
+        <PageMeta />
+      </head>
       <body className={`font-sans ${inter.variable}`}>
         <NavBar />
         {children}
@@ -36,3 +44,38 @@ export default function RootLayout({
     </html>
   );
 }
+
+export const metadata: Metadata = {
+  applicationName: APP_NAME,
+  title: {
+    default: APP_DEFAULT_TITLE,
+    template: APP_TITLE_TEMPLATE,
+  },
+  description: APP_DESCRIPTION,
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: APP_DEFAULT_TITLE,
+    // startUpImage: [],
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    siteName: APP_NAME,
+    title: {
+      default: APP_DEFAULT_TITLE,
+      template: APP_TITLE_TEMPLATE,
+    },
+    description: APP_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary",
+    title: {
+      default: APP_DEFAULT_TITLE,
+      template: APP_TITLE_TEMPLATE,
+    },
+    description: APP_DESCRIPTION,
+  },
+};

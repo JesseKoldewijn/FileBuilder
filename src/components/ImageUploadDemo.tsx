@@ -14,6 +14,9 @@ import {
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Label } from "./ui/label";
+import Image from "next/image";
+import Link from "next/link";
 
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
@@ -53,27 +56,39 @@ const ImageUploadDemo = () => {
         }),
       });
 
+      if (!response.ok) {
+        console.error("Failed to upload file");
+        return;
+      }
+
       const data = (await response.json()) as {
-        message: string;
-        fileName: string;
+        body: {
+          message: string;
+          fileName: string;
+        };
       };
 
-      setFileDetails(data);
+      console.log(data.body);
+      setFileDetails(data.body);
     }
   };
 
   return (
-    <div className="px-4 md:px-0">
+    <div className="mx-0 flex w-screen max-w-md flex-col items-center justify-center gap-4 px-4 md:px-0">
       {fileDetails && (
-        <div className="mx-auto flex max-w-md flex-col gap-2 pt-24">
+        <div className="flex w-full max-w-md flex-col gap-2">
           <p>{fileDetails.message}</p>
-          <p>{fileDetails.fileName}</p>
+          <Button variant="outline" asChild>
+            <Link href={fileDetails.fileName}>
+              Click here to open the image
+            </Link>
+          </Button>
         </div>
       )}
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="mx-auto flex max-w-md flex-col gap-2 pt-24"
+          className="flex w-full max-w-sm flex-col gap-2"
         >
           <FormField
             control={form.control}
@@ -81,24 +96,69 @@ const ImageUploadDemo = () => {
             render={({ field }) => {
               return (
                 <FormItem>
-                  <FormLabel>File</FormLabel>
+                  <FormLabel className="capitalize">{field.name}</FormLabel>
                   <FormControl>
-                    <Input type="file" placeholder="shadcn" {...fileRef} />
+                    <div className="flex flex-col gap-2 pb-2">
+                      {field.name === "file" ? (
+                        <>
+                          <ImagePreviewSection field={field} />
+                          <Button variant="outline" asChild>
+                            <Label htmlFor="file">Choose a file</Label>
+                          </Button>
+                          <Input
+                            id="file"
+                            type="file"
+                            className="hidden"
+                            max={1}
+                            accept="image/*"
+                            {...fileRef}
+                          />
+                        </>
+                      ) : (
+                        <Input {...field} />
+                      )}
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               );
             }}
           />
-          <Button
-            type="submit"
-            className="rounded-md border border-neutral-900 bg-neutral-900 p-2 text-white hover:border-neutral-300 hover:bg-neutral-300"
-          >
-            Upload
-          </Button>
+          <Button type="submit">Upload</Button>
         </form>
       </Form>
     </div>
   );
 };
 export default ImageUploadDemo;
+
+function ImagePreviewSection({
+  field,
+}: {
+  field: {
+    value: FileList | null;
+  };
+}) {
+  const file = field.value?.item(0);
+
+  if (!file) return;
+
+  return (
+    <div className="flex flex-col items-center gap-2 pb-2">
+      <ImagePreview file={file} />
+      <p>{file.name}</p>
+    </div>
+  );
+}
+
+function ImagePreview({ file }: { file: File }) {
+  return (
+    <Image
+      src={URL.createObjectURL(file)}
+      height={200}
+      width={200}
+      alt="preview"
+      className="aspect-square max-h-96 max-w-full object-cover"
+    />
+  );
+}
