@@ -3,6 +3,7 @@ import { customRandom, random } from "nanoid";
 import path from "path";
 import { access, mkdir, unlink, writeFile } from "fs/promises";
 import { NextResponse, type NextRequest } from "next/server";
+import { env } from "~/env";
 
 export const POST = async (req: NextRequest) => {
   const body = (await req.json()) as {
@@ -26,7 +27,9 @@ export const POST = async (req: NextRequest) => {
 
   const fileBlob = new Blob([fileBuffer], { type: `image/${ext}` });
 
-  const fsDir = path.join(process.cwd(), "public/uploads");
+  const isProd = env.NODE_ENV === "production";
+  const uploadPath = isProd ? "uploads" : "public/uploads";
+  const fsDir = path.join(process.cwd(), uploadPath);
   const filePath = path.join(fsDir, fileName);
 
   const uploadDirExists = await access(fsDir)
