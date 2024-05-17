@@ -28,9 +28,9 @@ COPY . .
 # ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN \
-  if [ -f yarn.lock ]; then yarn run build; \
-  elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
+  if [ -f yarn.lock ]; then yarn run standalone:build; \
+  elif [ -f package-lock.json ]; then npm run standalone:build; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run standalone:build; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
@@ -65,4 +65,4 @@ ENV PORT 3000
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD HOSTNAME="0.0.0.0" node server.js
+CMD HOSTNAME="0.0.0.0" STANDALONE_APP="true" node server.js
