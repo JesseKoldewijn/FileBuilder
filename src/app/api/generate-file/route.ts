@@ -1,8 +1,8 @@
 import { customRandom, random } from "nanoid";
 
-import path from "path";
-import { access, mkdir, unlink, writeFile } from "fs/promises";
 import { NextResponse, type NextRequest } from "next/server";
+import sharp from "sharp";
+import { dedupeCharacters } from "~/lib/image/compressor";
 
 export const POST = async (req: NextRequest) => {
   const body = (await req.json()) as {
@@ -24,35 +24,19 @@ export const POST = async (req: NextRequest) => {
 
   const fileBuffer = Buffer.from(file.split(",")[1] ?? "", "base64");
 
-  const fileBlob = new Blob([fileBuffer], { type: `image/${ext}` });
+  const compressImage = await sharp(fileBuffer).resize(300).toBuffer();
 
-  const uploadPath = "public/uploads";
-  const fsDir = path.join(process.cwd(), uploadPath);
-  const filePath = path.join(fsDir, fileName);
+  const fileBlob = new Blob([compressImage], { type: `image/${ext}` });
+  const fileUrl = `${fileName}.${ext}`;
 
-  const uploadDirExists = await access(fsDir)
-    .then(() => true)
-    .catch(() => false);
-
-  if (!uploadDirExists) {
-    await mkdir(fsDir);
-  }
-
-  const filePathWithExt = `${filePath}.${ext}`;
-  await writeFile(filePathWithExt, Buffer.from(await fileBlob.arrayBuffer()));
-
-  const fileUrl = `/uploads/${fileName}.${ext}`;
-
-  // passive timeout to delete the file after 1 hour (cleanup)
-  setTimeout(() => {
-    unlink(filePathWithExt).catch((x) => console.error(x));
-  }, 3600000);
+  const file64 = Buffer.from(await fileBlob.arrayBuffer()).toString("base64");
 
   return NextResponse.json({
     status: 200,
     body: {
       message: "File uploaded successfully",
       fileName: fileUrl,
+      fileBinary: dedupeCharacters(file64),
     },
   });
 };
