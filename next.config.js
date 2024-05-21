@@ -23,6 +23,9 @@ const config = {
   reactStrictMode: true,
   output: isStandalone ? "standalone" : undefined,
   poweredByHeader: false,
+  experimental: {
+    reactCompiler: true,
+  },
 };
 
 export default withSerwist(config);

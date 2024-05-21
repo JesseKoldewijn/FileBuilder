@@ -33,7 +33,7 @@ const ImageUploadDemo = () => {
 
   const [fileDetails, setFileDetails] = useState<{
     message: string;
-    fileName: string;
+    fileBinary: string;
   } | null>(null);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -64,21 +64,18 @@ const ImageUploadDemo = () => {
       const data = (await response.json()) as {
         body: {
           message: string;
-          fileName: string;
-          fileBlob: Blob;
+          fileBinary: string;
         };
       };
 
       const body = data?.body;
 
       if (body) {
-        const fP = String(body.fileName);
         // const publicPath = `http://localhost:3000/api/get-file?filename=${fP}`;
         const details: typeof fileDetails = {
           message: body.message,
-          fileName: fP,
+          fileBinary: body.fileBinary,
         };
-        console.log(body);
         setFileDetails(details);
       }
     }
@@ -89,11 +86,12 @@ const ImageUploadDemo = () => {
       {fileDetails && (
         <div className="flex w-full max-w-md flex-col gap-2">
           <p>{fileDetails.message}</p>
-          <Button variant="outline" asChild>
-            <Link href={fileDetails.fileName}>
-              Click here to open the image
-            </Link>
-          </Button>
+          <Image
+            src={fileDetails.fileBinary}
+            alt="Image which was send previously"
+            height={200}
+            width={200}
+          />
         </div>
       )}
       <Form {...form}>
