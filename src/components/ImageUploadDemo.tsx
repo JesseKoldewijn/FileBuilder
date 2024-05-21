@@ -33,6 +33,8 @@ const ImageUploadDemo = () => {
 
   const [fileDetails, setFileDetails] = useState<{
     message: string;
+    fileID: number;
+    imageID: string;
     fileBinary: string;
   } | null>(null);
 
@@ -64,6 +66,8 @@ const ImageUploadDemo = () => {
       const data = (await response.json()) as {
         body: {
           message: string;
+          fileID: number;
+          imageID: string;
           fileBinary: string;
         };
       };
@@ -74,6 +78,8 @@ const ImageUploadDemo = () => {
         // const publicPath = `http://localhost:3000/api/get-file?filename=${fP}`;
         const details: typeof fileDetails = {
           message: body.message,
+          fileID: body.fileID,
+          imageID: body.imageID,
           fileBinary: body.fileBinary,
         };
         setFileDetails(details);
@@ -84,14 +90,25 @@ const ImageUploadDemo = () => {
   return (
     <div className="mx-0 flex w-screen max-w-md flex-col items-center justify-center gap-4 px-4 md:px-0">
       {fileDetails && (
-        <div className="flex w-full max-w-md flex-col gap-2">
+        <div className="flex w-full max-w-md flex-col items-center gap-2">
           <p>{fileDetails.message}</p>
-          <Image
-            src={fileDetails.fileBinary}
-            alt="Image which was send previously"
-            height={200}
-            width={200}
-          />
+          <>
+            {fileDetails.imageID && (
+              <>
+                <Image
+                  src={`/api/get-image?id=${fileDetails.imageID}`}
+                  alt="Image which was send previously"
+                  height={200}
+                  width={200}
+                />
+                <Button size="sm" asChild>
+                  <Link href={`/api/get-image?id=${fileDetails.imageID}`}>
+                    Open image in new window
+                  </Link>
+                </Button>
+              </>
+            )}
+          </>
         </div>
       )}
       <Form {...form}>
