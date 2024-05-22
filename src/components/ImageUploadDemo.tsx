@@ -73,7 +73,7 @@ const ImageUploadDemo = () => {
       const body = data?.body;
 
       if (body) {
-        // const publicPath = `http://localhost:3000/api/get-file?filename=${fP}`;
+        // url > `http://localhost:3000/api/get-image?id=${fP}`;
         const details: typeof fileDetails = {
           message: body.message,
           fileID: body.fileID,
