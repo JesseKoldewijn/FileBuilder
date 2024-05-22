@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { NextResponse, type NextRequest } from "next/server";
+import sharp from "sharp";
 import { db } from "~/server/db";
 import { imageTable } from "~/server/schemas/images";
 
@@ -7,6 +8,7 @@ export const GET = async (req: NextRequest) => {
   const searchParams = new URL(req.url).searchParams;
 
   const id = searchParams.get("id");
+  const compress = !!searchParams.get("compress");
 
   if (!id) {
     return NextResponse.json({
@@ -36,13 +38,18 @@ export const GET = async (req: NextRequest) => {
       });
     }
 
-    const fileBuffer = Buffer.from(file.content, "base64");
-    const fileExt = file.content.split(";")[0]?.split("/")[1];
-    const mimeType = `image/${fileExt}`;
+    const ext = file.content.split(";")[0]?.split("/")[1];
+
+    const fileBuffer = Buffer.from(file.content.split(",")[1] ?? "", "base64");
+    const compressImage = compress
+      ? await sharp(fileBuffer).resize(300).blur(0.8).toBuffer()
+      : fileBuffer;
+
+    const mimeType = `image/${ext}`;
 
     const imageFileReadableStream = new ReadableStream({
       start(controller) {
-        controller.enqueue(fileBuffer);
+        controller.enqueue(compressImage);
         controller.close();
       },
     });

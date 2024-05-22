@@ -5,6 +5,10 @@ import { db } from "~/server/db";
 import { imageTable } from "~/server/schemas/images";
 
 export const POST = async (req: NextRequest) => {
+  const searchParams = new URL(req.url).searchParams;
+
+  const compress = !!searchParams.get("compress");
+
   const body = (await req.json()) as {
     file: string;
   };
@@ -22,13 +26,11 @@ export const POST = async (req: NextRequest) => {
   const ext = file.split(";")[0]?.split("/")[1];
 
   const fileBuffer = Buffer.from(file.split(",")[1] ?? "", "base64");
-  const compressImage = await sharp(fileBuffer)
-    .resize(100)
-    .blur(0.8)
-    .toBuffer();
-  const fileBlob = new Blob([compressImage], { type: `image/${ext}` });
+  const compressImage = compress
+    ? await sharp(fileBuffer).resize(100).blur(0.8).toBuffer()
+    : fileBuffer;
 
-  const file64 = Buffer.from(await fileBlob.arrayBuffer()).toString("base64");
+  const file64 = Buffer.from(compressImage).toString("base64");
   const b64String = `data:image/${ext};base64,${file64}`;
 
   // Instead of sending over b64 string, you can save the string to a database
@@ -40,19 +42,16 @@ export const POST = async (req: NextRequest) => {
   const fileID = customRandom(allBytes, 10, random)()?.substring(0, 50);
 
   try {
-    const dbInsert = await db.insert(imageTable).values({
+    await db.insert(imageTable).values({
       imageID: fileID,
-      content: file64,
+      content: b64String,
     });
-    const insertedId = dbInsert[0]?.insertId;
 
     return NextResponse.json({
       status: 200,
       body: {
         message: "File uploaded successfully",
-        fileID: insertedId,
-        imageID: fileID,
-        fileBinary: b64String,
+        fileID: fileID,
       },
     });
   } catch (error) {

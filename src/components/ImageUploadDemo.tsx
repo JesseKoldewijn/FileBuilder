@@ -34,7 +34,6 @@ const ImageUploadDemo = () => {
   const [fileDetails, setFileDetails] = useState<{
     message: string;
     fileID: number;
-    imageID: string;
     fileBinary: string;
   } | null>(null);
 
@@ -67,7 +66,6 @@ const ImageUploadDemo = () => {
         body: {
           message: string;
           fileID: number;
-          imageID: string;
           fileBinary: string;
         };
       };
@@ -79,7 +77,6 @@ const ImageUploadDemo = () => {
         const details: typeof fileDetails = {
           message: body.message,
           fileID: body.fileID,
-          imageID: body.imageID,
           fileBinary: body.fileBinary,
         };
         setFileDetails(details);
@@ -92,17 +89,18 @@ const ImageUploadDemo = () => {
       {fileDetails && (
         <div className="flex w-full max-w-md flex-col items-center gap-2">
           <p>{fileDetails.message}</p>
+          <pre>{JSON.stringify(fileDetails, null, 2)}</pre>
           <>
-            {fileDetails.imageID && (
+            {fileDetails.fileID && (
               <>
                 <Image
-                  src={`/api/get-image?id=${fileDetails.imageID}`}
+                  src={`/api/get-image?id=${fileDetails.fileID}`}
                   alt="Image which was send previously"
                   height={200}
                   width={200}
                 />
                 <Button size="sm" asChild>
-                  <Link href={`/api/get-image?id=${fileDetails.imageID}`}>
+                  <Link href={`/api/get-image?id=${fileDetails.fileID}`}>
                     Open image in new window
                   </Link>
                 </Button>
