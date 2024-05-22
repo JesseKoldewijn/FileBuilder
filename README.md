@@ -4,9 +4,7 @@
   <a href="https://github.com/JesseKoldewijn/FileBuilder/blob/main/LICENCE" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
-  <a href="https://twitter.com/dull_joker" target="_blank">
-    <img alt="Twitter: dull_joker" src="https://img.shields.io/twitter/follow/dull_joker.svg?style=social" />
-  </a>
+  <a href="https://twitter.com/dull_joker" target="_blank"><img alt="Twitter: dull_joker" src="https://img.shields.io/twitter/follow/dull_joker.svg?style=social" /></a>
 </p>
 
 > This application builds files based on a base64 string and responds with a public URL to allow file downloads for a curtain amount of time
