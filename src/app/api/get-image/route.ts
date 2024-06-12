@@ -8,7 +8,17 @@ export const GET = async (req: NextRequest) => {
   const searchParams = new URL(req.url).searchParams;
 
   const id = searchParams.get("id");
-  const compress = !!searchParams.get("compress");
+
+  const widthString = searchParams.get("width") ?? "100";
+  const heightString = searchParams.get("height") ?? "100";
+
+  const widthInt = !isNaN(parseInt(widthString)) ? parseInt(widthString) : 100;
+  const heightInt = !isNaN(parseInt(heightString))
+    ? parseInt(heightString)
+    : 100;
+
+  const compress =
+    !!searchParams.get("compress") || widthInt > 100 || heightInt > 100;
 
   if (!id) {
     return NextResponse.json({
@@ -42,7 +52,7 @@ export const GET = async (req: NextRequest) => {
 
     const fileBuffer = Buffer.from(file.content.split(",")[1] ?? "", "base64");
     const compressImage = compress
-      ? await sharp(fileBuffer).resize(300).blur(0.8).toBuffer()
+      ? await sharp(fileBuffer).resize(widthInt, heightInt).toBuffer()
       : fileBuffer;
 
     const mimeType = `image/${ext}`;
